@@ -3,7 +3,7 @@ module Nutrella
   # This is the top-level class for the gem.
   #
   class Command
-    attr_reader :cache_filename, :configuration_filename
+    attr_reader :cache_filename, :configuration_filename, :board_skeleton_filename
 
     def initialize(configuration_directory, board_name, board_skeleton_filename)
       @board_name = board_name
@@ -19,11 +19,15 @@ module Nutrella
     private
 
     def board_url
-      url_cache.fetch(@board_name) { task_board.lookup_or_create(@board_name).url }
+      url_cache.fetch(@board_name) { task_board.lookup_or_create(@board_name, board_skeleton).url }
     end
 
     def open(url)
       system("open #{url}")
+    end
+
+    def board_skeleton
+      BoardSkeleton.new(board_skeleton_filename)
     end
 
     def task_board

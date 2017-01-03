@@ -16,8 +16,8 @@ module Nutrella
       @organization = configuration.fetch(:organization)
     end
 
-    def lookup_or_create(board_name)
-      lookup(board_name) || create(board_name)
+    def lookup_or_create(board_name, board_skeleton)
+      lookup(board_name) || create(board_name, board_skeleton)
     end
 
     private
@@ -30,8 +30,28 @@ module Nutrella
       Trello::Action.search(board_name, modelTypes: "boards", board_fields: "all").fetch("boards", [])
     end
 
-    def create(board_name)
-      create_board(board_name).tap { |board| make_team_visible(board) }
+    def create(board_name, board_skeleton)
+      board = create_board(board_name).tap { |board| make_team_visible(board) }
+      apply_board_skeleton(board, board_skeleton) unless board_skeleton.blank?
+      board
+    end
+
+    def apply_board_skeleton(board, board_skeleton)
+      board.lists.each(&:close!)
+
+      board_skeleton.values[:lists].each do |list_attr|
+        list = Trello::List.create(list_attr.merge(board_id: board.id).except(:cards))
+
+        create_cards(list.id, list_attr[:cards])
+      end
+    end
+
+    def create_cards(list_id, cards)
+      return if cards.blank?
+
+      cards.each do |card_attr|
+        Trello::Card.create(card_attr.merge(list_id: list_id))
+      end
     end
 
     def create_board(board_name)

@@ -1,0 +1,28 @@
+"lists": [
+  {
+    "name": "To Do",
+    "pos": "bottom",
+    "cards": [
+      {
+        "name": "Notify Infra (if needed)",
+        "pos": "bottom"
+      },
+      {
+        "name": "Update Mingle",
+        "pos": "bottom"
+      },
+      {
+        "name": "--MVP--",
+        "pos": "bottom"
+      }
+    ]
+  },
+  {
+    "name": "Doing",
+    "pos": "bottom"
+  },
+  {
+    "name": "Done",
+    "pos": "bottom"
+  }
+]

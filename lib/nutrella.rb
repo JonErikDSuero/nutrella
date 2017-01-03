@@ -1,5 +1,6 @@
 require "active_support/core_ext/string"
 
+require "nutrella/board_skeleton"
 require "nutrella/cache"
 require "nutrella/command"
 require "nutrella/configuration"
