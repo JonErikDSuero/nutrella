@@ -5,8 +5,9 @@ module Nutrella
   class Command
     attr_reader :cache_filename, :configuration_filename
 
-    def initialize(configuration_directory, board_name)
+    def initialize(configuration_directory, board_name, board_skeleton_filename)
       @board_name = board_name
+      @board_skeleton_filename = board_skeleton_filename
       @cache_filename = File.join(configuration_directory, ".nutrella.cache.yml")
       @configuration_filename = File.join(configuration_directory, ".nutrella.yml")
     end

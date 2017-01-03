@@ -3,5 +3,6 @@
 require "nutrella"
 
 board_name = Nutrella::TaskBoardName.from_git_branch
+board_skeleton_filename = ARGV[0]
 
-Nutrella::Command.new(Dir.home, board_name).run
+Nutrella::Command.new(Dir.home, board_name, board_skeleton_filename).run
