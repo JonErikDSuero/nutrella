@@ -6,6 +6,7 @@ require "nutrella/configuration"
 require "nutrella/developer_keys"
 require "nutrella/task_board"
 require "nutrella/task_board_name"
+require "nutrella/trello_wrapper"
 require "nutrella/version"
 
 #

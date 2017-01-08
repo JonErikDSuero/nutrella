@@ -1,19 +1,9 @@
-require "trello"
-
 module Nutrella
-  #
-  # Knows how to use the Trello API to create and lookup task boards.
-  #
   class TaskBoard
     def initialize(configuration)
-      Trello.configure do |trello_client|
-        trello_client.consumer_key = configuration.fetch(:key)
-        trello_client.consumer_secret = configuration.fetch(:secret)
-        trello_client.oauth_token = configuration.fetch(:token)
-        trello_client.oauth_token_secret = configuration.fetch(:secret)
-      end
+      TrelloWrapper.configure_client(configuration)
 
-      @organization = configuration.fetch(:organization)
+      @organization_id = configuration.fetch(:organization)
     end
 
     def lookup_or_create(board_name)
@@ -27,19 +17,19 @@ module Nutrella
     end
 
     def matching_boards(board_name)
-      Trello::Action.search(board_name, modelTypes: "boards", board_fields: "all").fetch("boards", [])
+      TrelloWrapper.search_boards(board_name)
     end
 
     def create(board_name)
-      create_board(board_name).tap { |board| make_team_visible(board) }
+      create_board(board_name).tap { |board| make_team_visible(board.id) }
     end
 
     def create_board(board_name)
-      Trello::Board.create(name: board_name, organization_id: @organization)
+      TrelloWrapper.create_board(name: board_name, organization_id: @organization_id)
     end
 
-    def make_team_visible(board)
-      Trello.client.put("/boards/#{board.id}", "prefs/permissionLevel=org")
+    def make_team_visible(board_id)
+      TrelloWrapper.set_board_visible_to_organization(board_id)
     end
   end
 end
