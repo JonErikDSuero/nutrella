@@ -18,7 +18,19 @@ module Nutrella
     private
 
     def board_url
-      url_cache.fetch(@board_name) { task_board.lookup_or_create(@board_name).url }
+      url_cache.fetch(@board_name) { lookup_or_create_board.url }
+    end
+
+    def lookup_or_create_board
+      lookup_board || create_board
+    end
+
+    def lookup_board
+      task_board.lookup(name: @board_name)
+    end
+
+    def create_board
+      task_board.create(name: @board_name)
     end
 
     def open(url)
