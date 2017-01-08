@@ -27,12 +27,12 @@ RSpec.describe "Nutrella" do
       create_sample(subject.configuration_filename)
       trello_search(board_name, search_result: [])
 
-      expect(Trello::Board).to receive(:create)
+      expect(Nutrella::TrelloWrapper).to receive(:create_board)
         .with(name: board_name, organization_id: "developer_organization")
         .and_return(board)
 
-      expect_any_instance_of(Trello::Client).to receive(:put)
-        .with("/boards/#{board.id}", "prefs/permissionLevel=org")
+      expect(Nutrella::TrelloWrapper).to receive(:set_board_visible_to_organization)
+        .with(board.id)
 
       expect(subject).to receive(:system).with("open #{url}")
 
@@ -45,9 +45,9 @@ RSpec.describe "Nutrella" do
   end
 
   def trello_search(board_name, search_result:)
-    allow(Trello::Action).to receive(:search)
-      .with(board_name, modelTypes: "boards", board_fields: "all")
-      .and_return("boards" => search_result)
+    allow(Nutrella::TrelloWrapper).to receive(:search_boards)
+      .with(board_name)
+      .and_return(search_result)
   end
 
   def create_sample(configuration_filename)
