@@ -40,8 +40,30 @@ RSpec.describe "Nutrella" do
     end
   end
 
-  def create_command
-    Dir.mktmpdir { |home_dir| yield Nutrella::Command.new(home_dir, board_name) }
+  it "creates a task board with scaffold" do
+    board_scaffold_filename = "board_scaffold_filename.yml"
+
+    create_command(board_scaffold_filename) do |subject|
+      create_sample(subject.configuration_filename)
+      trello_search(board_name, search_result: [])
+
+      expect(subject.board_scaffold_filename).to eq(board_scaffold_filename)
+
+      expect(Nutrella::TrelloWrapper).to receive(:create_board)
+        .with(name: board_name, organization_id: "developer_organization")
+        .and_return(board)
+
+      expect(Nutrella::TrelloWrapper).to receive(:set_board_visible_to_organization)
+        .with(board.id)
+
+      expect(subject).to receive(:system).with("open #{url}")
+
+      subject.run
+    end
+  end
+
+  def create_command(board_scaffold_filename = nil)
+    Dir.mktmpdir { |home_dir| yield Nutrella::Command.new(home_dir, board_name, board_scaffold_filename) }
   end
 
   def trello_search(board_name, search_result:)
