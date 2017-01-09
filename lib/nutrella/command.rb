@@ -7,7 +7,7 @@ module Nutrella
 
     def initialize(configuration_directory, board_name, board_scaffold_filename = nil)
       @board_name = board_name
-      @board_scaffold_filename = board_scaffold_filename
+      @board_scaffold = BoardScaffoldFactory.build(board_scaffold_filename)
       @cache_filename = File.join(configuration_directory, ".nutrella.cache.yml")
       @configuration_filename = File.join(configuration_directory, ".nutrella.yml")
     end
@@ -32,6 +32,10 @@ module Nutrella
 
     def create_board
       task_board.create(name: @board_name)
+
+      task_board.apply_board_scaffold(@board_scaffold)
+
+      task_board.board
     end
 
     def open(url)
@@ -39,7 +43,7 @@ module Nutrella
     end
 
     def task_board
-      TaskBoard.new(Configuration.values(configuration_filename))
+      @task_board ||= TaskBoard.new(Configuration.values(configuration_filename))
     end
 
     def url_cache

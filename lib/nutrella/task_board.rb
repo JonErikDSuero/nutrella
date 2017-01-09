@@ -1,5 +1,7 @@
 module Nutrella
   class TaskBoard
+    attr_accessor :board
+
     def initialize(configuration)
       TrelloWrapper.configure_client(configuration)
 
@@ -7,11 +9,15 @@ module Nutrella
     end
 
     def lookup(name:)
-      matching_boards(name).find { |board| board.name == name }
+      @board = matching_boards(name).find { |board| board.name == name }
     end
 
     def create(name:)
-      create_board(name).tap { |board| make_team_visible(board.id) }
+      @board = create_board(name).tap { |board| make_team_visible(board.id) }
+    end
+
+    def apply_board_scaffold(board_scaffold)
+
     end
 
     private

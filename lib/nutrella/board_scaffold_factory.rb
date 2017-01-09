@@ -1,9 +1,13 @@
 module Nutrella
   class BoardScaffold
-    def initialize(filename)
-      abort "the file for board scaffold is missing" unless File.exists?(filename)
+    def initialize(path)
+      abort "the file for board scaffold is missing" unless File.exists?(path)
 
-      @filename = filename
+      @path = path
+    end
+
+    def values
+      @values = YAML.load_file(@path).deep_symbolize_keys!
     end
   end
 
@@ -12,9 +16,9 @@ module Nutrella
   end
 
   module BoardScaffoldFactory
-    def self.build(filename)
-      if filename.present?
-        BoardScaffold.new(filename)
+    def self.build(path)
+      if path.present?
+        BoardScaffold.new(path)
       else
         NullBoardScaffold.new
       end
