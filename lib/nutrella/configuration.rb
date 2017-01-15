@@ -15,9 +15,15 @@ module Nutrella
 
       # Optional Configuration
       organization: #{NULOGY_ORGANIZATION_ID}
+
+      board_template:
+        lists:
+          - name: To Do
+          - name: Doing
+          - name: Done
     YAML
 
-    attr_reader :path, :values
+    attr_reader :path, :values, :board_template
 
     def self.values(path)
       new(path).values
@@ -38,7 +44,8 @@ module Nutrella
         key: configuration.fetch("key"),
         secret: configuration.fetch("secret"),
         token: configuration.fetch("token"),
-        organization: configuration.fetch("organization", NULOGY_ORGANIZATION_ID)
+        organization: configuration.fetch("organization", NULOGY_ORGANIZATION_ID),
+        board_template: configuration.fetch("board_template", {}).deep_symbolize_keys
       }
     rescue => e
       abort "#{path} #{e}"

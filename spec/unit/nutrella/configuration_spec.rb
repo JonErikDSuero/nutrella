@@ -6,7 +6,7 @@ RSpec.describe Nutrella::Configuration do
   it "succeeds when the configuration exists and is well formed" do
     configuration_file_contents(key: "c1", secret: "5f", token: "3c", organization: "org")
 
-    expect(configuration).to eq(key: "c1", secret: "5f", token: "3c", organization: "org")
+    expect(configuration).to eq(key: "c1", secret: "5f", token: "3c", organization: "org", board_template: {})
   end
 
   it "handles the case when the configuration is missing" do
