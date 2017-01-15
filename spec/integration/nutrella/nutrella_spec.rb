@@ -53,7 +53,11 @@ RSpec.describe "Nutrella" do
       allow_any_instance_of(Trello::Client).to receive(:put)
       allow(subject).to receive(:system)
 
-      expect(Trello::List).to receive(:create).with(name: "list_name", board_id: board.id)
+      expect(Trello::List).to receive(:create).with(
+        name: "list_name",
+        board_id: board.id,
+        pos: Nutrella::TaskBoard::TRELLO_APPEND_TO_BOTTOM_POSITION
+      )
 
       subject.run
     end

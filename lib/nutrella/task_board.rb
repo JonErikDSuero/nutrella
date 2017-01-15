@@ -5,6 +5,8 @@ module Nutrella
   # Knows how to use the Trello API to create and lookup task boards.
   #
   class TaskBoard
+    TRELLO_APPEND_TO_BOTTOM_POSITION = "bottom"
+
     def initialize(configuration)
       Trello.configure do |trello_client|
         trello_client.consumer_key = configuration.fetch(:key)
@@ -59,7 +61,11 @@ module Nutrella
 
     def apply_board_template(board)
       @board_template[:lists].each do |list|
-        Trello::List.create(name: list[:name], board_id: board.id)
+        Trello::List.create(
+          name: list[:name],
+          board_id: board.id,
+          pos: TRELLO_APPEND_TO_BOTTOM_POSITION
+        )
       end
     end
   end
