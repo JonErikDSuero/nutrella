@@ -14,6 +14,7 @@ module Nutrella
       end
 
       @organization = configuration.fetch(:organization)
+      @board_template = configuration.fetch(:board_template)
     end
 
     def lookup_or_create(board_name)
@@ -31,15 +32,35 @@ module Nutrella
     end
 
     def create(board_name)
-      create_board(board_name).tap { |board| make_team_visible(board) }
+      board = create_board(board_name)
+
+      make_team_visible(board)
+
+      apply_board_template(board) if @board_template.any?
+
+      board
     end
 
     def create_board(board_name)
-      Trello::Board.create(name: board_name, organization_id: @organization)
+      board = Trello::Board.create(name: board_name, organization_id: @organization)
+
+      clear_board(board)
+
+      board
+    end
+
+    def clear_board(board)
+      board.lists.each(&:close!)
     end
 
     def make_team_visible(board)
       Trello.client.put("/boards/#{board.id}", "prefs/permissionLevel=org")
+    end
+
+    def apply_board_template(board)
+      @board_template[:lists].each do |list|
+        Trello::List.create(name: list[:name], board_id: board.id)
+      end
     end
   end
 end

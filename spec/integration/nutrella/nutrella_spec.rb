@@ -1,7 +1,7 @@
 RSpec.describe "Nutrella" do
   let(:board_name) { "My Board" }
   let(:url) { "board_url" }
-  let(:board) { instance_double(Trello::Board, id: "id", name: board_name, url: url) }
+  let(:board) { instance_double(Trello::Board, id: "id", name: board_name, url: url, lists: []) }
 
   it "creates initial configuration file" do
     create_command do |subject|
@@ -40,6 +40,25 @@ RSpec.describe "Nutrella" do
     end
   end
 
+  it "creates list(s) using board template" do
+    create_command do |subject|
+      board_template = {
+        "lists" => [
+          { "name" => "list_name" }
+        ]
+      }
+      create_sample(subject.configuration_filename, board_template: board_template)
+      trello_search(board_name, search_result: [])
+      allow(Trello::Board).to receive(:create).and_return(board)
+      allow_any_instance_of(Trello::Client).to receive(:put)
+      allow(subject).to receive(:system)
+
+      expect(Trello::List).to receive(:create).with(name: "list_name", board_id: board.id)
+
+      subject.run
+    end
+  end
+
   def create_command
     Dir.mktmpdir { |home_dir| yield Nutrella::Command.new(home_dir, board_name) }
   end
@@ -50,16 +69,27 @@ RSpec.describe "Nutrella" do
       .and_return("boards" => search_result)
   end
 
-  def create_sample(configuration_filename)
-    File.write(configuration_filename, <<-SAMPLE.strip_heredoc)
-        # Trello Developer API Keys
-        key: developer_key
-        secret: developer_secret
-        token: developer_token
+  def create_sample(configuration_filename, board_template: {})
+    yaml = <<-SAMPLE.strip_heredoc
+      # Trello Developer API Keys
+      key: developer_key
+      secret: developer_secret
+      token: developer_token
 
-        # Optional Configuration
-        organization: developer_organization
+      # Optional Configuration
+      organization: developer_organization
     SAMPLE
+
+    yaml += interpolatable_yaml({ "board_template" => board_template })
+
+    File.write(configuration_filename, yaml)
+  end
+
+
+  def interpolatable_yaml(values)
+    values
+      .to_yaml
+      .gsub("---\n", '')
   end
 
   RSpec::Matchers.define :have_configuration do |expected_configuration|
