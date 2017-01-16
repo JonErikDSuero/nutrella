@@ -45,7 +45,7 @@ module Nutrella
         secret: configuration.fetch("secret"),
         token: configuration.fetch("token"),
         organization: configuration.fetch("organization", NULOGY_ORGANIZATION_ID),
-        board_template: configuration.fetch("board_template", {}).deep_symbolize_keys
+        board_template: configuration.fetch("board_template", {})
       }
     rescue => e
       abort "#{path} #{e}"

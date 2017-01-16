@@ -60,9 +60,9 @@ module Nutrella
     end
 
     def apply_board_template(board)
-      @board_template[:lists].each do |list|
+      @board_template["lists"].each do |list|
         Trello::List.create(
-          name: list[:name],
+          name: list["name"],
           board_id: board.id,
           pos: TRELLO_APPEND_TO_BOTTOM_POSITION
         )
